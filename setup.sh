@@ -20,3 +20,5 @@ fi
 . $VENV/bin/activate
 
 pip install -r requirements.txt
+
+chmod +x action-schedule.py.tpl
