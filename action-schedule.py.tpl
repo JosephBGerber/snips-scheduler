@@ -6,6 +6,7 @@ from hermes_python.hermes import Hermes
 from hermes_python.ffi.utils import MqttOptions
 from hermes_python.ontology import *
 import io
+import db
 
 CONFIGURATION_ENCODING_FORMAT = "utf-8"
 CONFIG_INI = "config.ini"
@@ -36,6 +37,7 @@ def action_wrapper(hermes, intent_message, conf):
 
 
 if __name__ == "__main__":
+    db.init()
     mqtt_opts = MqttOptions()
     with Hermes(mqtt_options=mqtt_opts) as h:
         h.subscribe_intent("JosephBGerber:SetReminder", subscribe_intent_callback).start()
