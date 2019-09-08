@@ -1,57 +1,52 @@
 import time
 import sqlite3
 
-DB_URL = "/home/pi/.action-scheduler"
-
-conn = sqlite3.connect(DB_URL)
-cursor = conn.cursor()
+DB_URL = "/home/joseph/.action-scheduler"
 
 
-def init():
-    sql_create_events_table = """ CREATE TABLE IF NOT EXISTS events (
-                                        uuid integer PRIMARY KEY,
-                                        event_time integer NOT NULL,
-                                        name TEXT
-                                    ); """
+class Database:
 
-    cursor.execute(sql_create_events_table)
+    def __init__(self):
 
+        self.conn = sqlite3.connect(DB_URL)
+        self.cursor = self.conn.cursor()
 
-def create_event(event_time, name=None):
-    sql_insert_event_without_name = """ INSERT INTO events (event_time, name)
-                                        VALUES (?, NULL);"""
+        sql_create_events_table = """ CREATE TABLE IF NOT EXISTS events (
+                                            uuid integer PRIMARY KEY,
+                                            event_time integer NOT NULL,
+                                            name TEXT
+                                        ); """
 
-    sql_insert_event_with_name = """ INSERT INTO events (event_time, name)
-                                        VALUES (?, ?);"""
+        self.cursor.execute(sql_create_events_table)
+        self.conn.commit()
 
-    if name is None:
-        try:
-            cursor.execute(sql_insert_event_without_name, [event_time])
-            conn.commit()
-        except Exception as e:
-            print(e)
+    def create_event(self, event_time, name=None):
+        sql_insert_event_without_name = """ INSERT INTO events (event_time, name)
+                                            VALUES (?, NULL);"""
 
-    else:
-        try:
-            cursor.execute(sql_insert_event_with_name, [event_time, name])
-            conn.commit()
-        except Exception as e:
-            print(e)
+        sql_insert_event_with_name = """ INSERT INTO events (event_time, name)
+                                            VALUES (?, ?);"""
 
+        if name is None:
+            self.cursor.execute(sql_insert_event_without_name, [event_time])
+            self.conn.commit()
 
-def get_due_events():
-    event_time = time.time()
-    sql_select_due_event = """SELECT uuid, name
-                              FROM events
-                              WHERE event_time < ?;"""
+        else:
+            self.cursor.execute(sql_insert_event_with_name, [event_time, name])
+            self.conn.commit()
 
-    cursor.execute(sql_select_due_event, [event_time])
+    def get_due_events(self):
+        event_time = time.time()
+        sql_select_due_event = """SELECT uuid, name
+                                  FROM events
+                                  WHERE event_time < ?;"""
 
-    return cursor.fetchall()
+        self.cursor.execute(sql_select_due_event, [event_time])
 
+        return self.cursor.fetchall()
 
-def delete_event(uuid):
-    sql_delete_event = """DELETE FROM events WHERE uuid=?"""
+    def delete_event(self, uuid):
+        sql_delete_event = """DELETE FROM events WHERE uuid=?"""
 
-    cursor.execute(sql_delete_event, [uuid])
-    conn.commit()
+        self.cursor.execute(sql_delete_event, [uuid])
+        self.conn.commit()

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from typing import Dict
 import configparser
-from hermes_python.hermes import Hermes
+from hermes_python.hermes import Hermes, IntentMessage
 from hermes_python.ffi.utils import MqttOptions
 from hermes_python.ontology import *
 import io
@@ -28,16 +29,33 @@ def read_configuration_file(configuration_file):
 
 
 def subscribe_intent_callback(hermes, intent_message):
+    # type: (Hermes, IntentMessage) -> None
     conf = read_configuration_file(CONFIG_INI)
     action_wrapper(hermes, intent_message, conf)
 
 
 def action_wrapper(hermes, intent_message, conf):
-    hermes.publish_end_session(intent_message.session_id, "Can someone please tell me what ligma is?")
+    # type: (Hermes, IntentMessage, Dict) -> None
+
+    handle = db.Database()
+
+    if len(intent_message.slots) == 1:
+        time = intent_message.slots["time"].first().value
+
+        handle.create_event(time)
+        hermes.publish_end_session(intent_message.session_id, "I'll remind you!")
+        return
+
+    if len(intent_message.slots) == 2:
+        time = intent_message.slots["time"].first().value
+        event = intent_message.slots["event"].first().value
+
+        handle.create_event(time, event)
+        hermes.publish_end_session(intent_message.session_id, "I'll remind you to {}".format(event))
+        return
 
 
 if __name__ == "__main__":
-    db.init()
     mqtt_opts = MqttOptions()
     with Hermes(mqtt_options=mqtt_opts) as h:
         h.subscribe_intent("JosephBGerber:SetReminder", subscribe_intent_callback).start()
