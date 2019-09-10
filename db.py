@@ -1,7 +1,7 @@
 import time
 import sqlite3
 
-DB_URL = "/var/lib/snips/snips-scheduler/action-scheduler.sqlite"
+DB_URL = "/var/lib/snips/skills/snips-scheduler/action-scheduler.sqlite"
 
 
 class Database:
