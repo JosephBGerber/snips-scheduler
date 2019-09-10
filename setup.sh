@@ -22,5 +22,3 @@ fi
 pip install -r requirements.txt
 
 chmod +x action-schedule.py.tpl
-
-mkdir -m 777 /var/lib/snips/skills/snips-scheduler
