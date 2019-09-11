@@ -30,10 +30,12 @@ class Database:
         if name is None:
             self.cursor.execute(sql_insert_event_without_name, [event_time])
             self.conn.commit()
+            return self.cursor.lastrowid
 
         else:
             self.cursor.execute(sql_insert_event_with_name, [event_time, name])
             self.conn.commit()
+            return self.cursor.lastrowid
 
     def get_due_events(self):
         event_time = time.time()
