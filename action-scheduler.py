@@ -23,7 +23,7 @@ def set_reminder_callback(hermes, intent_message):
     if len(intent_message.slots) == 1:
         uuid = handle.create_event(event_time)
         message = "Reminder created at %I %M %p with an I D of {}".format(uuid)
-        message = event_time_struct.strftime(message)
+        message = time.strftime(message, event_time_struct)
         hermes.publish_end_session(intent_message.session_id, message)
         return
 
@@ -34,7 +34,7 @@ def set_reminder_callback(hermes, intent_message):
         message = "Reminder created to {} at %I %M %p with an I D of {}".format(
             event,
             uuid)
-        message = event_time_struct.strftime(message)
+        message = time.strftime(message, event_time_struct)
         hermes.publish_end_session(intent_message.session_id, message)
         return
 
@@ -46,7 +46,7 @@ def delete_reminder_callback(hermes, intent_message):
 
     handle = db.Database()
     handle.delete_event(uuid)
-    message = "Reminder with id {} deleted".format(uuid)
+    message = "Reminder with I D {} deleted".format(uuid)
     hermes.publish_end_session(intent_message.session_id, message)
 
 
@@ -59,7 +59,7 @@ def event_thread(hermes):
         time.sleep(1)
         for (uuid, name) in handle.get_due_events():
             if name is None:
-                hermes.publish_start_session_notification("default", "This is a reminder to do your shit.", None)
+                hermes.publish_start_session_notification("default", "This is a reminder to do your stuff.", None)
                 handle.delete_event(uuid)
             else:
                 message = "This is a reminder to {}".format(name)
