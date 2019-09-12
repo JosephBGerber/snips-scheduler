@@ -21,4 +21,4 @@ fi
 
 pip install -r requirements.txt
 
-chmod +x action-schedule.py.tpl
+chmod +x action-scheduler.py

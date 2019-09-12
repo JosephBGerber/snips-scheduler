@@ -22,10 +22,8 @@ def set_reminder_callback(hermes, intent_message):
 
     if len(intent_message.slots) == 1:
         uuid = handle.create_event(event_time)
-        message = "Reminder created at {} {} with an id of {}".format(
-            event_time_struct.tm_hour,
-            event_time_struct.tm_min,
-            uuid)
+        message = "Reminder created at %I %M %p with an I D of {}".format(uuid)
+        message = event_time_struct.strftime(message)
         hermes.publish_end_session(intent_message.session_id, message)
         return
 
@@ -33,11 +31,10 @@ def set_reminder_callback(hermes, intent_message):
         event = intent_message.slots["event"].first().value
 
         uuid = handle.create_event(event_time)
-        message = "Reminder created to {} at {} {} with an id of {}".format(
+        message = "Reminder created to {} at %I %M %p with an I D of {}".format(
             event,
-            event_time_struct.tm_hour,
-            event_time_struct.tm_min,
             uuid)
+        message = event_time_struct.strftime(message)
         hermes.publish_end_session(intent_message.session_id, message)
         return
 
